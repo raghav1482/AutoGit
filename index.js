@@ -24,7 +24,7 @@ app.get("/commit", async (req, res) => {
         git.cwd(repoPath); // Set the working directory
         await git.add(".");
         await git.commit(commitMessage);
-        await git.push("origin", "main"); // Replace "main" with your branch name if different
+        await git.push("origin", "master"); // Replace "main" with your branch name if different
 
         console.log("Git commit and push successful.");
         res.send("Git commit and push successful.");
