@@ -5,16 +5,44 @@ const path = require("path");
 require("dotenv").config();
 
 const app = express();
-const repoPath = path.resolve(__dirname, process.env.REPO_PATH || ""); // Path to your repo
-const commitMessage = process.env.COMMIT_MESSAGE || "Automated commit triggered via Express.js";
+const repoPath = path.resolve(__dirname, process.env.REPO_NAME || "AutoGit");
+const gitRepoUrl = process.env.GIT_REPO_URL || "https://github.com/raghav1482/AutoGit.git";
 const branchName = process.env.BRANCH_NAME || "master";
+const commitMessage = process.env.COMMIT_MESSAGE || "Automated commit triggered via Render";
+const gitUserName = process.env.GIT_USER_NAME || "Your Name"; // Replace with your name
+const gitUserEmail = process.env.GIT_USER_EMAIL || "your-email@example.com"; // Replace with your email
+
+// Clone the repo if it doesn't exist
+async function ensureRepoExists() {
+    if (!fs.existsSync(repoPath)) {
+        console.log(`Cloning repository from ${gitRepoUrl}...`);
+        await git.clone(gitRepoUrl, repoPath);
+        console.log("Repository cloned successfully.");
+    } else {
+        console.log("Repository already exists locally.");
+    }
+}
+
+// Configure Git author
+async function configureGitAuthor() {
+    try {
+        await git.addConfig("user.name", gitUserName);
+        await git.addConfig("user.email", gitUserEmail);
+        console.log("Git author configured:", gitUserName, gitUserEmail);
+    } catch (error) {
+        console.error("Error configuring Git author:", error);
+    }
+}
 
 // Function to perform Git commit
 async function performGitCommit() {
     try {
-        // Create or update a file in the repository
         const filePath = path.join(repoPath, "log.txt");
         const logContent = `Log entry: ${new Date().toISOString()}\n`;
+
+        // Ensure repo exists and write to file
+        await ensureRepoExists();
+        await configureGitAuthor(); // Configure author identity
         fs.appendFileSync(filePath, logContent);
 
         // Perform Git operations
