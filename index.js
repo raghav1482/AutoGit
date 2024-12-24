@@ -51,6 +51,6 @@ setInterval(() => {
 }, 10000); // 10000 milliseconds = 10 seconds
 
 // Start the server
-app.listen(8000, () => {
+app.listen(process.env.PORT || 8000, () => {
     console.log("Server is running at http://localhost:8000");
 });
