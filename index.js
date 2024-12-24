@@ -2,7 +2,6 @@ const express = require("express");
 const git = require("simple-git")();
 const fs = require("fs");
 const path = require("path");
-const schedule = require("node-schedule");
 require("dotenv").config();
 
 const app = express();
@@ -24,7 +23,7 @@ async function performGitCommit() {
         await git.commit(commitMessage);
         await git.push("origin", branchName);
 
-        console.log("Git commit and push successful.");
+        console.log("Git commit and push successful at", new Date().toISOString());
     } catch (error) {
         console.error("Error during Git commit:", error);
     }
@@ -45,11 +44,11 @@ app.get("/commit", async (req, res) => {
     }
 });
 
-// Schedule automatic commits 3 times a day (e.g., 9 AM, 3 PM, 9 PM)
-schedule.scheduleJob("0 9,15,21 * * *", () => {
+// Schedule automatic commits every 10 seconds
+setInterval(() => {
     console.log("Running scheduled Git commit...");
     performGitCommit();
-});
+}, 10000); // 10000 milliseconds = 10 seconds
 
 // Start the server
 app.listen(8000, () => {
