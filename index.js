@@ -23,17 +23,6 @@ async function ensureRepoExists() {
     }
 }
 
-// Configure Git author
-async function configureGitAuthor() {
-    try {
-        await git.addConfig("user.name", gitUserName);
-        await git.addConfig("user.email", gitUserEmail);
-        console.log("Git author configured:", gitUserName, gitUserEmail);
-    } catch (error) {
-        console.error("Error configuring Git author:", error);
-    }
-}
-
 // Function to perform Git commit
 async function performGitCommit() {
     try {
@@ -42,13 +31,16 @@ async function performGitCommit() {
 
         // Ensure repo exists and write to file
         await ensureRepoExists();
-        await configureGitAuthor(); // Configure author identity
         fs.appendFileSync(filePath, logContent);
 
         // Perform Git operations
         git.cwd(repoPath); // Set the working directory
         await git.add(".");
-        await git.commit(commitMessage);
+
+        // Explicitly set the author using the --author flag
+        const author = `${gitUserName} <${gitUserEmail}>`;
+        await git.commit(commitMessage, { "--author": author });
+
         await git.push("origin", branchName);
 
         console.log("Git commit and push successful at", new Date().toISOString());
