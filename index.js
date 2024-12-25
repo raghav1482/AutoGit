@@ -73,7 +73,7 @@ app.get("/commit", async (req, res) => {
 setInterval(() => {
     console.log("Running scheduled Git commit...");
     performGitCommit();
-}, 10000); // 10000 milliseconds = 10 seconds
+}, 20000000); // 10000 milliseconds = 10 seconds
 
 // Start the server
 app.listen(process.env.PORT || 8000, () => {
