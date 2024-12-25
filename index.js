@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const app = express();
 const repoPath = path.resolve(__dirname, process.env.REPO_NAME || "AutoGit");
-const gitRepoUrl = process.env.GIT_REPO_URL || "https://github.com/raghav1482/AutoGit.git";
+const gitRepoUrl = `https://${process.env.GIT_PAT}@github.com/raghav1482/AutoGit.git`;
 const branchName = process.env.BRANCH_NAME || "master";
 const commitMessage = process.env.COMMIT_MESSAGE || "Automated commit triggered via Render";
 const gitUserName = process.env.GIT_USER_NAME || "Your Name"; // Replace with your name
@@ -27,7 +27,8 @@ async function ensureRepoExists() {
 async function performGitCommit() {
     try {
         const filePath = path.join(repoPath, "log.txt");
-        const logContent = `Log entry: ${new Date().toISOString()}\n`;
+        const logContent = `Log entry: ${new Date().toISOString()}
+`;
 
         // Ensure repo exists and write to file
         await ensureRepoExists();
@@ -35,12 +36,16 @@ async function performGitCommit() {
 
         // Perform Git operations
         git.cwd(repoPath); // Set the working directory
+        await git.addConfig("user.name", gitUserName);
+        await git.addConfig("user.email", gitUserEmail);
+        
         await git.add(".");
 
         // Explicitly set the author using the --author flag
         const author = `${gitUserName} <${gitUserEmail}>`;
         await git.commit(commitMessage, { "--author": author });
 
+        console.log("Pushing to branch:", branchName);
         await git.push("origin", branchName);
 
         console.log("Git commit and push successful at", new Date().toISOString());
